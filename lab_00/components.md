@@ -27,13 +27,13 @@ System_Boundary(messenger, "Мессенджер") {
 Rel(admin, web_site, "Просмотр, добавление и редактирование информации о пользователях")
 Rel(user, web_site, "Регистрация, отправка сообщений другим пользователем, создание групповых чатов")
 
-Rel(web_site, client_service, "Работа с пользователями", "localhost/person")
+Rel(web_site, client_service, "Работа с пользователями")
 Rel(client_service, db, "INSERT/SELECT/UPDATE", "SQL")
 
-Rel(web_site, group_service, "Работа с групповыми чатами", "localhost/pres")
+Rel(web_site, group_service, "Работа с групповыми чатами")
 Rel(group_service, db, "INSERT/SELECT/UPDATE", "SQL")
 
-Rel(web_site, ptp_service, "Работа с ptp чатами", "localhost/person")
+Rel(web_site, ptp_service, "Работа с ptp чатами")
 Rel(ptp_service, db, "INSERT/SELECT/UPDATE", "SQL")
 
 @enduml
