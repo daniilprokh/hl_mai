@@ -10,6 +10,8 @@ CREATE TABLE IF NOT EXISTS users (
     first_name  VARCHAR(256)    NOT NULL,
     last_name   VARCHAR(256)    NOT NULL,
     email       VARCHAR(256)    NOT NULL,
+    login       VARCHAR(256)    NOT NULL,
+    password    VARCHAR(256)    NOT NULL,
         INDEX name_index    USING   BTREE (first_name, last_name),
         INDEX email_index   USING   HASH  (email)
 )
