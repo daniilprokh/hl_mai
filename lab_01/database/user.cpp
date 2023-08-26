@@ -131,12 +131,12 @@ std::optional<User> User::ReadById(uint64_t id) {
         Statement select(session);
         User user;
         select << "SELECT "
-                  "id,"
+                  "user_id,"
                   "first_name,"
                   "last_name,"
                   "email,"
                   "login,"
-                  "password FROM User where id=?",
+                  "password FROM users where id=?",
             into(user.id_),
             into(user.first_name_),
             into(user.last_name_),
@@ -173,7 +173,7 @@ std::optional<uint64_t> User::Authorize(std::string login,
         Statement select(session);
         long id;
         select << "SELECT "
-                  "id FROM User where login=? and password=?",
+                  "user_id FROM users where login=? and password=?",
             into(id),
             use(login),
             use(password),
@@ -210,12 +210,12 @@ std::vector<User> User::Search(std::string firstName,
         firstName += '%';
         lastName += '%';
         select << "SELECT "
-                  "id,"
+                  "user_id,"
                   "first_name,"
                   "last_name,"
                   "email,"
                   "login,"
-                  "password FROM User where first_name LIKE ? and last_name LIKE ?",
+                  "password FROM users where first_name LIKE ? and last_name LIKE ?",
             into(user.id_),
             into(user.first_name_),
             into(user.last_name_),
@@ -252,7 +252,7 @@ void User::SaveToMySQL() {
         Session session = database.CreateSession();
         Statement insert(session);
 
-        insert << "INSERT INTO User "
+        insert << "INSERT INTO users "
                   "(first_name,last_name,email,login,password) "
                   "VALUES(?, ?, ?, ?, ?)",
             use(first_name_),
