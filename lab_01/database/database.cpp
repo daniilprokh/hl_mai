@@ -20,6 +20,8 @@ Database::Database() {
     connection_str_ += ";password=";
     connection_str_ += config.GetPassword();
 
+    std::cout << connection_str_ << std::endl; 
+
     Poco::Data::MySQL::Connector::registerConnector();
     pool_ = std::make_unique<Poco::Data::SessionPool>(
         Poco::Data::MySQL::Connector::KEY, connection_str_
