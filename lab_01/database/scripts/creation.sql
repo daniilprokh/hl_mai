@@ -1,5 +1,9 @@
 # Создание базы данных
 CREATE DATABASE IF NOT EXISTS messenger;
+# Создание админа базы данных
+CREATE USER IF NOT EXISTS test_admin IDENTIFIED BY 'password';
+# Предоставления админу полномочий
+GRANT ALL ON messenger.* TO test_admin;
 
 USE messenger;
 
