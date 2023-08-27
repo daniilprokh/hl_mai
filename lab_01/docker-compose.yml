@@ -1,49 +1,55 @@
-version: '2.1'
+version: "2.1"
 
 services:
-  mai-db-node-ex01:
-    build:
-      context: mariadb
-      dockerfile: Dockerfile
-    container_name: mai-db-node-ex01
+  mariadb:
+    image: mariadb
     restart: unless-stopped
     environment:
-      MYSQL_DATABASE: messenger
-      MYSQL_USER: admin
-      MYSQL_PASSWORD: password1
-      MYSQL_ROOT_PASSWORD: '1'
-    command: >
-      --sql-mode='STRICT_TRANS_TABLES,ERROR_FOR_DIVISION_BY_ZERO,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION'
-      --general-log=ON
-      --log-queries-not-using-indexes=ON
+      MARIADB_ROOT_PASSWORD: password
+      MARIADB_DATABASE: messenger
+      MARIADB_USER: test_admin
+      MARIADB_PASSWORD: password
     networks:
       - arch-network
     ports:
-      - 3360:3306
+      - 3306:3306
     healthcheck:
-      test: "/usr/bin/mysql --user=admin --password=password1 --execute \"SHOW DATABASES;\""
-      timeout: 20s
+      test: [
+        "CMD",
+        "mariadb",
+        "--user=test_admin",
+        "--password=password",
+        "--execute=SELECT * FROM users",
+        "--host=127.0.0.1",
+        "--port=3306",
+        "messenger"
+      ]
+      interval: 10s
+      timeout: 5s
       retries: 5
     volumes:
-      - db-node-ex01-data:/var/lib/mysql
-
+      # persist data files into `datadir` volume managed by docker
+      - datadir:/var/lib/mysql
+      # bind-mount any sql files that should be run while initializing
+      - ./database/scripts/creation.sql:/docker-entrypoint-initdb.d/creation.sql
+      - ./database/scripts/insertion.sql:/docker-entrypoint-initdb.d/insertion.sql
   web_server:
     build:
       context: web_server
       dockerfile: Dockerfile
     container_name: web_server
     environment:
-      - DB_HOST=mai-db-node-ex01
+      - DB_HOST=mariadb
       - DB_PORT=3306
-      - DB_LOGIN=admin
-      - DB_PASSWORD=password1
+      - DB_LOGIN=test_admin
+      - DB_PASSWORD=password
       - DB_DATABASE=messenger
     ports:
       - 8080:8080
     networks:
       - arch-network
     depends_on:
-      mai-db-node-ex01:
+      mariadb:
         condition: service_healthy
   other_server:
     build:
@@ -58,7 +64,7 @@ services:
       - arch-network
 
 volumes:
-  db-node-ex01-data:
+  datadir:
 
 networks:
   arch-network:
