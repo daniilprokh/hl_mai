@@ -6,4 +6,4 @@ RUN git clone -b master https://github.com/pocoproject/poco.git && cd poco && mk
 RUN git clone https://github.com/daniilprokh/hl_mai.git
 RUN sudo ldconfig
 RUN cd hl_mai && mkdir build && cd build && cmake  .. && make
-ENTRYPOINT [ "hl_mai//build/lab_01/other_service" ]
+ENTRYPOINT [ "hl_mai/build/lab_01/other_service" ]
