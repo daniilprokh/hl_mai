@@ -4,4 +4,6 @@ export DB_LOGIN=test_admin
 export DB_PASSWORD=password
 export DB_DATABASE=messenger
 
-../build/lab_01/web_service
+export LD_LIBRARY_PATH=/usr/local/lib
+
+../../build/labs/lab_01/lab_01_web_service

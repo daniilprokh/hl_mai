@@ -4,4 +4,4 @@ export DB_LOGIN=test_admin
 export DB_PASSWORD=password
 export DB_DATABASE=messenger
 
-../build/lab_01/web_service
+../../build/labs/lab_02/lab_02_web_service

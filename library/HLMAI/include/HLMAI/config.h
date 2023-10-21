@@ -22,17 +22,23 @@ class Config : public Singleton<Config> {
 
     Config()
     : Singleton<Config>(),
-      database_(std::getenv("DB_DATABASE")),
-      host_(std::getenv("DB_HOST")),
-      port_(std::getenv("DB_PORT")),
-      login_(std::getenv("DB_LOGIN")),
-      password_(std::getenv("DB_PASSWORD")),
-      cache_server_(std::getenv("CACHE")),
-      queue_host_(std::getenv("QUEUE_HOST")),
-      queue_topic_(std::getenv("QUEUE_TOPIC")),
-      queue_group_id_(std::getenv("QUEUE_GROUP_ID"))
+      database_(GetEnvironment("DB_DATABASE")),
+      host_(GetEnvironment("DB_HOST")),
+      port_(GetEnvironment("DB_PORT")),
+      login_(GetEnvironment("DB_LOGIN")),
+      password_(GetEnvironment("DB_PASSWORD")),
+      cache_server_(GetEnvironment("CACHE")),
+      queue_host_(GetEnvironment("QUEUE_HOST")),
+      queue_topic_(GetEnvironment("QUEUE_TOPIC")),
+      queue_group_id_(GetEnvironment("QUEUE_GROUP_ID"))
     {}
     ~Config() = default;
+
+    static std::string GetEnvironment(const char *name) {
+      char *environment = std::getenv(name);
+      return environment ? std::string(environment)
+                         : std::string();
+    }
 
     std::string database_;
     std::string host_;
