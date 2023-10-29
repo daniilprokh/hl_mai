@@ -18,10 +18,24 @@ find_package(Poco REQUIRED COMPONENTS Data DataMySQL JSON)
 add_library(${PROJECT_NAME} STATIC)
 
 set(PUBLIC_HEADERS
+  include/HLMAI/database/chat_user/chat_user_feature.h
+  include/HLMAI/database/chat_user/chat_user_converter.h
+  include/HLMAI/database/chat_user/chat_user_table.h
+  include/HLMAI/database/chat_user/chat_user.h
+  include/HLMAI/database/group_chat/group_chat_feature.h
+  include/HLMAI/database/group_chat/group_chat_converter.h
+  include/HLMAI/database/group_chat/group_chat_message_table.h
+  include/HLMAI/database/group_chat/group_chat_table.h
+  include/HLMAI/database/group_chat/group_chat.h
   include/HLMAI/database/message/message_feature.h
   include/HLMAI/database/message/message_converter.h
   include/HLMAI/database/message/message_table.h
   include/HLMAI/database/message/message.h
+  include/HLMAI/database/p2p_chat/p2p_chat_feature.h
+  include/HLMAI/database/p2p_chat/p2p_chat_converter.h
+  include/HLMAI/database/p2p_chat/p2p_chat_message_table.h
+  include/HLMAI/database/p2p_chat/p2p_chat_table.h
+  include/HLMAI/database/p2p_chat/p2p_chat.h
   include/HLMAI/database/user/user.h
   include/HLMAI/database/user/user_feature.h
   include/HLMAI/database/user/user_converter.h
@@ -38,8 +52,14 @@ set(PUBLIC_HEADERS
 )
 
 set(SOURCES ${PUBLIC_HEADERS}
-src/database/message/message_converter.cpp
+  src/database/chat_user/chat_user_converter.cpp
+  src/database/chat_user/chat_user_table.cpp
+  src/database/group_chat/group_chat_converter.cpp
+  src/database/group_chat/group_chat_table.cpp
+  src/database/message/message_converter.cpp
   src/database/message/message_table.cpp
+  src/database/p2p_chat/p2p_chat_converter.cpp
+  src/database//p2p_chat/p2p_chat_table.cpp
   src/database/user/user_converter.cpp
   src/database/user/user_table.cpp
   src/database/database.cpp

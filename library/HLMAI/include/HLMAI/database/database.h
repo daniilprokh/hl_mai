@@ -15,35 +15,35 @@ namespace database {
 
 template <class SessionResult>
 using HandleSession =
-  std::function<SessionResult (Poco::Data::Session&)>;
+  std::function<SessionResult (Poco::Data::Session &)>;
 
 class Database : public Singleton<Database>  {
-  public:
-    template <class SessionResult>
-    SessionResult SessionLife(
-      const HandleSession<SessionResult>& handleSession,
-      std::ostream& errorOutput = std::cout);
+ public:
+  template <class SessionResult>
+  SessionResult SessionLife(
+    const HandleSession<SessionResult> &handleSession,
+    std::ostream &errorOutput = std::cout);
 
-    std::vector<std::string> GetShardingHints();
-    std::string GetUserShardingHint(uint64_t userId);
-  private:
-    friend Singleton<Database>;
+  std::vector<std::string> GetShardingHints();
+  std::string GetUserShardingHint(uint64_t userId);
+ private:
+  friend Singleton<Database>;
 
-    Database();
-    ~Database() = default;
+  Database();
+  ~Database() = default;
 
-    std::string FormShardingName(uint8_t nodeIdx);
+  std::string FormShardingName(uint8_t nodeIdx);
 
-    const uint8_t kNodeCount{2};
+  const uint8_t kNodeCount{2};
 
-    std::string connection_str_;
-    std::unique_ptr<Poco::Data::SessionPool> pool_;
+  std::string connection_str_;
+  std::unique_ptr<Poco::Data::SessionPool> pool_;
 };
 
 template <class SessionResult>
 SessionResult Database::SessionLife(
-    const HandleSession<SessionResult>& handleSession,
-    std::ostream& errorOutput) {
+    const HandleSession<SessionResult> &handleSession,
+    std::ostream &errorOutput) {
   try {
     Poco::Data::Session session = Poco::Data::Session(pool_->get());
     return handleSession(session);

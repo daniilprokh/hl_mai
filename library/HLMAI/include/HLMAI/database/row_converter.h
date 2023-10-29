@@ -5,9 +5,9 @@
 
 template <class Derived, class Tuple>
 class RowConverter {
-  public:
-    Poco::JSON::Object::Ptr RowToJSON(const Tuple& row);
-    Tuple RowFromJSON(const Poco::JSON::Object::Ptr& jsonObject);
+ public:
+  Poco::JSON::Object::Ptr RowToJSON(const Tuple& row);
+  Tuple RowFromJSON(const Poco::JSON::Object::Ptr& jsonObject);
 };
 
 template <class Derived, class Tuple>

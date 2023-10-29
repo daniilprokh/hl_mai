@@ -26,8 +26,8 @@ void UserTable::Insertion(Poco::Data::Session &session, User &user) {
       use(user.get<kUserLastName>()),
       use(user.get<kUserEmail>()),
       use(user.get<KUserLogin>()),
-      use(user.get<kUserPassword>());
-  insert.execute();
+      use(user.get<kUserPassword>()),
+      now;
 }
 
 void UserTable::Create() {
@@ -69,8 +69,7 @@ std::optional<User> UserTable::ReadById(uint64_t id) {
           this->kName,
           into(user),
           use(id),
-          range(0, 1);
-      select.execute();
+          now;
       Poco::Data::RecordSet rs(select);
       return rs.moveFirst() ? std::optional<User>(user)
                             : std::optional<User>();
@@ -78,25 +77,43 @@ std::optional<User> UserTable::ReadById(uint64_t id) {
   );
 }
 
+std::optional<uint64_t> UserTable::GetUserId(std::string login) {
+  return SessionOperation<std::optional<uint64_t>>(
+    [this, &login](Poco::Data::Session& session) {
+      Poco::Data::Statement select(session);
+      uint64_t id;
+      select << "SELECT user_id "
+                "FROM %s WHERE login = ?",
+          this->kName,
+          into(id),
+          use(login),
+          now;
+
+      Poco::Data::RecordSet rs(select);
+      return rs.moveFirst() ? std::optional<uint64_t>(id)
+                            : std::nullopt;
+    }
+  );
+}
+
 std::optional<uint64_t> UserTable::Authorize(std::string login,
                                              std::string password) {
   return SessionOperation<std::optional<uint64_t>>(
-      [this, &login, &password](Poco::Data::Session& session) {
-        Poco::Data::Statement select(session);
-        long id;
-        select << "SELECT user_id "
-                  "FROM %s WHERE login = ? and password = ?",
-            this->kName,
-            into(id),
-            use(login),
-            use(password),
-            range(0, 1);
+    [this, &login, &password](Poco::Data::Session& session) {
+      Poco::Data::Statement select(session);
+      uint64_t id;
+      select << "SELECT user_id "
+                "FROM %s WHERE login = ? AND password = ?",
+          this->kName,
+          into(id),
+          use(login),
+          use(password),
+          now;
 
-        select.execute();
-        Poco::Data::RecordSet rs(select);
-        return rs.moveFirst() ? std::optional<uint64_t>(id)
-                              : std::optional<uint64_t>();
-      }
+      Poco::Data::RecordSet rs(select);
+      return rs.moveFirst() ? std::optional<uint64_t>(id)
+                            : std::nullopt;
+    }
   );
 }
 
@@ -114,10 +131,8 @@ std::vector<User> UserTable::Search(std::string firstName,
                   "WHERE first_name LIKE ? AND last_name LIKE ?",
             this->kName,
             into(result),
-            use(firstName),
-            use(lastName),
-            range(0, 1);
-        select.execute();
+            use(firstName), use(lastName),
+            now;
         return result;
       }
   );
@@ -128,7 +143,7 @@ void UserTable::Preload(const std::string &filePath) {
   if (!input.is_open()) {
     return;
   }
-  std::string json_str(std::istream_iterator<char>(input),{});
+  std::string json_str(std::istream_iterator<char>(input), {});
   input.close();
 
   Poco::JSON::Parser parser;
@@ -136,9 +151,10 @@ void UserTable::Preload(const std::string &filePath) {
   Poco::JSON::Array::Ptr arr = result.extract<Poco::JSON::Array::Ptr>();
 
   std::vector<User> users;
+  auto &user_converter = UserConverter::GetInstance();
   for (size_t idx = 0; idx < arr->size(); idx += 1) {
     Poco::JSON::Object::Ptr object = arr->getObject(idx);
-     users.push_back(UserConverter::GetInstance().RowFromJSON(object));
+     users.push_back(user_converter.RowFromJSON(object));
   }
 
   SessionOperation<void>(
@@ -149,6 +165,5 @@ void UserTable::Preload(const std::string &filePath) {
     }
   );
 }
-
 
 }

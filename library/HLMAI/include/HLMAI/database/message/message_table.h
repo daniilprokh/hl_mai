@@ -7,22 +7,24 @@
 
 #include <Poco/Tuple.h>
 
+#include <optional>
+
 namespace database {
   
-class MessageTable : public Table<Message>, public Singleton<MessageTable> {
-public:
+class MessageTable : public Table<Message>
+{
+ public:
+  void Create() final;
+  void SaveToMySQL(Message &message) final;
 
-
-  void Create() override;
-  void SaveToMySQL(Message& message) override;
-
+  std::optional<uint64_t> AddChatMessage(uint64_t chatId,
+                                         uint64_t userId,
+                                         std::string &messageText);
   std::vector<Message> GetChatMessages(uint64_t chatId);
-  private:
-    friend Singleton<MessageTable>;
-
-    MessageTable();
-    ~MessageTable() = default;
-
+ protected:
+  MessageTable() = delete;
+  MessageTable(const char *messageTableName);
+  virtual ~MessageTable() = default;
 };
 
 }

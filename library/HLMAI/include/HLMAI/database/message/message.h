@@ -2,6 +2,7 @@
 #define MESSAGE_H_HL_MAI
 
 #include <Poco/Tuple.h>
+#include <Poco/DateTime.h>
 
 #include <string>
 
@@ -11,7 +12,7 @@ using Message = Poco::Tuple<uint64_t,
                             uint64_t,
                             uint64_t,
                             std::string,
-                            std::string>;
+                            Poco::DateTime>;
 
 }
 

@@ -10,17 +10,17 @@
 #include <string>
 
 class Cache : public Singleton<Cache> {
-  public:
-    bool Get(uint64_t id, std::string &value);
-    void Put(uint64_t id, const std::string &value);
-  private:
-    friend Singleton<Cache>;
+ public:
+  bool Get(uint64_t id, std::string &value);
+  void Put(uint64_t id, const std::string &value);
+ private:
+  friend Singleton<Cache>;
 
-    Cache();
-    ~Cache() = default;
+  Cache();
+  ~Cache() = default;
 
-    std::mutex mutex_;
-    std::shared_ptr<std::iostream> stream_;
+  std::mutex mutex_;
+  std::shared_ptr<std::iostream> stream_;
 };
 
 #endif

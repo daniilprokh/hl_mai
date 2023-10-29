@@ -8,9 +8,8 @@ using namespace Poco::Data::Keywords;
 namespace database
 {
 
-MessageTable::MessageTable() 
-  : Table<Message>("messages", 5),
-    Singleton<MessageTable>()
+MessageTable::MessageTable(const char *messageTableName) 
+  : Table<Message>(messageTableName, 5)
 {}
 
 void MessageTable::Create() {
@@ -30,9 +29,9 @@ void MessageTable::Create() {
   );
 }
 
-void MessageTable::SaveToMySQL(Message& message) {
+void MessageTable::SaveToMySQL(Message &message) {
   SessionOperation<void>(
-    [this, &message](Poco::Data::Session& session) {
+    [this, &message](Poco::Data::Session &session) {
       Poco::Data::Statement insert(session);
       insert << "INSERT INTO %s "
                 "(chat_id,user_id,text,date_time) "
@@ -41,15 +40,34 @@ void MessageTable::SaveToMySQL(Message& message) {
           use(message.get<kMessageChatId>()),
           use(message.get<kMessageUserId>()),
           use(message.get<kMessageText>()),
-          use(message.get<kMessageDateTime>());
-      insert.execute();
+          use(message.get<kMessageDateTime>()),
+          now;
+    }
+  );
+}
+
+std::optional<uint64_t> MessageTable::AddChatMessage(
+    uint64_t chatId,
+    uint64_t userId,
+    std::string &messageText) {
+  return SessionOperation<std::optional<uint64_t>>(
+    [this, &chatId, &userId, &messageText](Poco::Data::Session& session) {
+      Poco::Data::Statement insert(session);
+      insert << "INSERT INTO %s "
+                "(chat_id,user_id,text) "
+                "VALUES(?, ?, ?)",
+          this->kName,
+          use(chatId), use(userId), use(messageText),
+          now;
+
+      return this->GetLastId(session);
     }
   );
 }
 
 std::vector<Message> MessageTable::GetChatMessages(uint64_t chatId) {
   return SessionOperation<std::vector<Message>>(
-    [this, &chatId](Poco::Data::Session& session) {
+    [this, &chatId](Poco::Data::Session &session) {
       Poco::Data::Statement select(session);
       std::vector<Message> result;
       select << "SELECT *"
@@ -57,8 +75,8 @@ std::vector<Message> MessageTable::GetChatMessages(uint64_t chatId) {
           this->kName,
           into(result),
           use(chatId),
-          range(0, 1);
-      select.execute();
+          range(0, 1),
+          now;
       return result;
     }
   );        
