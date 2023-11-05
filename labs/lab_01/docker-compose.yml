@@ -19,7 +19,7 @@ services:
         "mariadb",
         "--user=test_admin",
         "--password=password",
-        "--execute=SELECT * FROM users",
+#        "--execute=SELECT * FROM users",
         "--host=127.0.0.1",
         "--port=3306",
         "messenger"
@@ -31,8 +31,8 @@ services:
       # persist data files into `datadir` volume managed by docker
       - datadir:/var/lib/mysql
       # bind-mount any sql files that should be run while initializing
-      - ./database/scripts/creation.sql:/docker-entrypoint-initdb.d/creation.sql
-      - ./database/scripts/insertion.sql:/docker-entrypoint-initdb.d/insertion.sql
+      - ./scripts/creation.sql:/docker-entrypoint-initdb.d/creation.sql
+      - ./scripts/insertion.sql:/docker-entrypoint-initdb.d/insertion.sql
   web_server:
     build:
       context: web_server
@@ -44,6 +44,7 @@ services:
       - DB_LOGIN=test_admin
       - DB_PASSWORD=password
       - DB_DATABASE=messenger
+      - LD_LIBRARY_PATH=/usr/local/lib
     ports:
       - 8080:8080
     networks:
@@ -58,6 +59,7 @@ services:
     container_name: other_server
     environment:
       - SERVICE_HOST=web_server
+      - LD_LIBRARY_PATH=/usr/local/lib
     ports:
       - 8081:8081
     networks:

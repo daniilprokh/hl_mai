@@ -43,23 +43,6 @@ void P2pChatTable::SaveToMySQL(P2pChat &p2pChat) {
   );
 }
 
-std::optional<uint64_t> P2pChatTable::AddP2pChat(uint64_t userId1,
-                                                 uint64_t userId2) {
-  return SessionOperation<std::optional<uint64_t>>(
-    [this, &userId1, &userId2](Poco::Data::Session &session) {
-      Poco::Data::Statement insert(session);
-      insert << "INSERT INTO %s "
-                "(user_id1, user_id2) "
-                "VALUES(?, ?)",
-          this->kName,
-          use(userId1), use(userId2),
-          now;
-
-      return this->GetLastId(session);
-    }
-  );
-}
-
 std::optional<uint64_t> P2pChatTable::GetP2pChatId(uint64_t userId1,
                                                    uint64_t userId2) {
   return SessionOperation<std::optional<uint64_t>>(

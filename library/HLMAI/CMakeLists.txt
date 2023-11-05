@@ -13,7 +13,14 @@ set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/")
 
 find_package(CppKafka REQUIRED)
 find_package(MySQL REQUIRED)
-find_package(Poco REQUIRED COMPONENTS Data DataMySQL JSON)
+find_package(Poco REQUIRED COMPONENTS 
+    Data
+    DataMySQL
+    JSON
+    XML
+    Util
+    Net
+)
 
 add_library(${PROJECT_NAME} STATIC)
 
@@ -45,8 +52,10 @@ set(PUBLIC_HEADERS
   include/HLMAI/database/row_converter.h
   include/HLMAI/database/table.h
   include/HLMAI/cache.h
+  include/HLMAI/check_html_form.h
   include/HLMAI/config.h
   include/HLMAI/contains_substr.h
+  include/HLMAI/http_web_server.h
   include/HLMAI/identity.h
   include/HLMAI/singleton.h
 )
@@ -88,6 +97,8 @@ target_link_libraries(${PROJECT_NAME}
     Poco::Data
     Poco::DataMySQL
     Poco::JSON
+    Poco::Util
+    Poco::Net
 )
 
 target_compile_definitions(${PROJECT_NAME}

@@ -1,0 +1,209 @@
+openapi: '3.0.0'
+
+info:
+  title: "Authorization Service API"
+  description: "API для задания по курсу Архитектура программных систем"
+  version: "1.0"
+
+servers:
+- url: "http://localhost:8080"
+    description: "Authorization Server"
+
+paths:
+  /auth:
+    get:
+      summary: "Проверка аутентификации"
+      responses:
+        200:
+          description: User ID
+          content:
+            application/json:
+              schema:
+               type: string
+        401:
+          description: "Отсутствие аутентификации"
+          content:
+            application/json:
+              schema:
+                type: string
+  /search:
+    get:
+      summary: "Поиск пользователей по маске имени и фамилии"
+      parameters:
+        - $ref: '#/components/parameters/first_name'
+        - $ref: '#/components/parameters/last_name'
+      responses:
+        200:
+          description: "Пользователи для предоставленной маски"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/users'
+        400:
+          description: "Ошибка в параметрах запроса"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        404:
+          description: "Пользователи для предоставленной маски не найдены"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        500:
+          description: "Неожиданная ошибка"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /user:
+    get:
+      summary: "Чтение информации о пользователе"
+      parameters:
+        - $ref: '#/components/parameters/user_id'
+      responses:
+        200:
+          description: "Найденный пользователь"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/user'
+        400:
+          description: "Ошибка в параметрах запроса"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        404:
+          description: "Пользователь не найден"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        500:
+          description: "Неожиданная ошибка"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+    post:
+      summary: Добавление нового пользователя
+      parameters:
+        - $ref: '#/components/parameters/first_name'
+        - $ref: '#/components/parameters/last_name'
+        - $ref: '#/components/parameters/email'
+        - $ref: '#/components/parameters/login'
+        - $ref: '#/components/parameters/password'
+      responces:
+        200:
+          description: "Идентификатор, добавленного пользователя"
+          content:
+            application/json:
+              schema:
+                type: integer
+        400:
+          description: "Ошибка в параметрах запроса"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        404:
+          description: Ошибка добавления пользователя
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        500:
+          description: "Неожиданная ошибка"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+components:
+
+  parametres:
+    user_id:
+      name: user_id
+      description: "Уникальный идентификатор пользователя"
+      in: query
+      required: true
+      schema:
+        type: integer
+    first_name:
+      name: first_name
+      description: "Имя пользователя"
+      in: query
+      required: true
+      schema:
+        type: string
+    last_name:
+      name: last_name
+      description: "Фамилия пользователя"
+      in: query
+      required: true
+      schema:
+        type: string
+    email:
+      name: email
+      description: "Почта пользователя"
+      in: query
+      required: true
+      schema:
+        type: string
+    login:
+      name: login
+      description: "Логин пользователя"
+      in: query
+      required: true
+      schema:
+        type: string
+    password:
+      name: password
+      description: "Пароль пользователя"
+      in: query
+      required: true
+      schema:
+        type: string
+
+  schemas:
+    user:
+      type: object
+      required:
+        - user_id
+        - first_name
+        - last_name
+        - email
+        - login
+        - password
+      properties:
+        user_id:
+          type: integer
+        first_name:
+          type: string
+        last_name:
+          type: string
+        email:
+          type: string
+        login:
+          type: string
+        password:
+          type: string
+    users:
+      type: array
+      items:
+        $ref: '#/components/schemas/user'
+    Error:
+      type: object
+      required:
+        - message
+      properties:
+        message:
+          description: "Сообщение о ошибке"
+          type: string
+
+  securitySchemes:
+      basicAuth:     
+        type: http
+        scheme: basic

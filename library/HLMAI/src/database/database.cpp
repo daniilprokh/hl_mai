@@ -11,15 +11,15 @@ Database::Database() {
   Config& config = Config::GetInstance();
 
   connection_str_ += "host=";
-  connection_str_ += config.GetHost();
+  connection_str_ += config.GetDatabaseHost();
   connection_str_ += ";user=";
-  connection_str_ += config.GetLogin();
+  connection_str_ += config.GetDatabaseLogin();
   connection_str_ += ";db=";
-  connection_str_ += config.GetDatabase();
+  connection_str_ += config.GetDatabaseName();
   connection_str_ += ";port=";
-  connection_str_ += config.GetPort();
+  connection_str_ += config.GetDatabasePort();
   connection_str_ += ";password=";
-  connection_str_ += config.GetPassword();
+  connection_str_ += config.GetDatabasePassword();
 
   std::cout << connection_str_ << std::endl; 
 

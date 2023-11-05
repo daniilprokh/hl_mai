@@ -16,7 +16,6 @@ class P2pChatTable : public Table<P2pChat>,
   virtual void Create() override;
   virtual void SaveToMySQL(P2pChat &p2pChat) override;
 
-  std::optional<uint64_t> AddP2pChat(uint64_t userId1, uint64_t userId2);
   std::optional<uint64_t> GetP2pChatId(uint64_t userId1, uint64_t userId2);
  private:
   friend Singleton<P2pChatTable>;

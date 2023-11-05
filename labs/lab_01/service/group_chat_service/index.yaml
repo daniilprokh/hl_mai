@@ -1,0 +1,14 @@
+openapi: '3.0.0'
+
+info:
+  title: "Group Chat Service API"
+  description: "API для задания по курсу Архитектура программных систем"
+  version: "1.0"
+
+  servers:
+- url: "http://localhost:8081"
+    description: "Group Chat Server"
+
+components:
+
+  parametres:
