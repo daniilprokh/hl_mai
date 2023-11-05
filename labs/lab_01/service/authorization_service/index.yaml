@@ -7,7 +7,7 @@ info:
 
 servers:
 - url: "http://localhost:8080"
-    description: "Authorization Server"
+description: "Authorization Server"
 
 paths:
   /auth:
