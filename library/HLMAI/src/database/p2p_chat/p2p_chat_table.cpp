@@ -39,6 +39,10 @@ void P2pChatTable::SaveToMySQL(P2pChat &p2pChat) {
           use(p2pChat.get<kP2pChatUserId1>()),
           use(p2pChat.get<kP2pChatUserId2>()),
           now;
+
+      if (auto id = this->GetLastId(session)) {
+        p2pChat.set<kP2pChatId>(id.value());
+      }
     }
   );
 }
@@ -49,14 +53,17 @@ std::optional<uint64_t> P2pChatTable::GetP2pChatId(uint64_t userId1,
     [this, &userId1, &userId2](Poco::Data::Session &session) {
       Poco::Data::Statement select(session);
       uint64_t id;
+      std::string condition = 
+          Poco::format("(user_id1 = %[0]lu AND user_id2 = %[1]lu) OR "
+                       "(user_id1 = %[1]lu AND user_id2 = %[0]lu)",
+            userId1, userId2);
       select << "SELECT p2p_chat_id FROM %s "
-                "WHERE (user_id1 = %[0]d AND user_id2 = %[1]d) OR "
-                      "(user_id1 = %[1]d AND user_id2 = %[0]d)",
+                "WHERE %s",
           into(id),
           this->kName,
-          userId1, userId2,
+          condition,
           now;
-
+      
       Poco::Data::RecordSet rs(select);
       return rs.moveFirst() ? std::optional<uint64_t>(id)
                             : std::nullopt;

@@ -39,21 +39,6 @@ void ChatUserTable::SaveToMySQL(ChatUser &chatUser) {
   );
 }
 
-void ChatUserTable::AddUserToChat(uint64_t chatId, uint64_t userId) {
-  SessionOperation<void>(
-    [this, &chatId, &userId](Poco::Data::Session &session) {
-      Poco::Data::Statement insert(session);
-      insert << "INSERT INTO %s "
-                "(user_id, chat_id) "
-                "VALUES(?, ?)",
-          this->kName,
-          use(userId),
-          use(chatId),
-          now;
-    }
-  );
-}
-
 std::vector<uint64_t> ChatUserTable::GetChatUsers(uint64_t chatId) {
   return SessionOperation<std::vector<uint64_t>>(
     [this, &chatId](Poco::Data::Session &session) {

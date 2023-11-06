@@ -61,7 +61,7 @@ class AutorizationHandler : public Poco::Net::HTTPRequestHandler {
     root->set("type", "/errors/http_not_found");
     root->set("title", "Internal exception");
     root->set("detail", "request not found");
-    //root->set("instance", "/user");
+    root->set("instance", "/authorization");
 
     std::ostream &ostr = response.send();
     Poco::JSON::Stringifier::stringify(root, ostr);
@@ -188,7 +188,7 @@ class AutorizationHandler : public Poco::Net::HTTPRequestHandler {
         response.setContentType("application/json");
 
         std::ostream &ostr = response.send();
-        ostr << id.value() << std::endl;
+        ostr << id.value();
         return;
       }
     }
@@ -293,7 +293,7 @@ class AutorizationHandler : public Poco::Net::HTTPRequestHandler {
         response.setContentType("application/json");
 
         std::ostream &ostr = response.send();
-        ostr << user.get<database::kUserId>() << std::endl;         
+        ostr << user.get<database::kUserId>();         
       }
       else
       {

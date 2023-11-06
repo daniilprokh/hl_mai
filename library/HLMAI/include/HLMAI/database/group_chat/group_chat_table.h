@@ -15,8 +15,6 @@ class GroupChatTable : public Table<GroupChat>,
  public:
   virtual void Create() override;
   virtual void SaveToMySQL(GroupChat &groupChat) override;
-
-  std::optional<uint64_t> AddGroupChat(std::string &title); 
  private:
   friend Singleton<GroupChatTable>;
 

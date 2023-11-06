@@ -52,6 +52,20 @@ add_executable(${P2P_CHAT_SERVICE}
 
 target_link_libraries(${P2P_CHAT_SERVICE} PRIVATE HLMAI)
 
+set(OTHER_SERVICE ${PROJECT_NAME}_other_service)
+
+set(O_HEADERS
+  service/other_service/other_handler.h
+  service/other_service/http_other_request_factory.h  
+)
+
+add_executable(${OTHER_SERVICE}
+  ${O_HEADERS}
+  service/other_service/other_service.cpp
+)
+
+target_link_libraries(${OTHER_SERVICE} PRIVATE HLMAI)
+
 #set(WEB_SERVICE ${PROJECT_NAME}_web_service)
 #set(OTHER_SERVICE ${PROJECT_NAME}_other_service)
 

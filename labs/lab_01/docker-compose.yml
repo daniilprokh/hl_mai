@@ -33,17 +33,18 @@ services:
       # bind-mount any sql files that should be run while initializing
       - ./scripts/creation.sql:/docker-entrypoint-initdb.d/creation.sql
       - ./scripts/insertion.sql:/docker-entrypoint-initdb.d/insertion.sql
-  web_server:
+  authorization_service:
     build:
-      context: web_server
+      context: service/authorization_service
       dockerfile: Dockerfile
-    container_name: web_server
+    container_name: authorization_service
     environment:
       - DB_HOST=mariadb
       - DB_PORT=3306
       - DB_LOGIN=test_admin
       - DB_PASSWORD=password
       - DB_DATABASE=messenger
+      - SERVICE_PORT=8080
       - LD_LIBRARY_PATH=/usr/local/lib
     ports:
       - 8080:8080
@@ -52,16 +53,57 @@ services:
     depends_on:
       mariadb:
         condition: service_healthy
-  other_server:
+  group_chat_service:
     build:
-      context: other_server
+      context: service/group_chat_service
       dockerfile: Dockerfile
-    container_name: other_server
+    container_name: group_chat_service
     environment:
-      - SERVICE_HOST=web_server
+      - DB_HOST=mariadb
+      - DB_PORT=3306
+      - DB_LOGIN=test_admin
+      - DB_PASSWORD=password
+      - DB_DATABASE=messenger
+      - SERVICE_PORT=8081
       - LD_LIBRARY_PATH=/usr/local/lib
     ports:
       - 8081:8081
+    networks:
+      - arch-network
+    depends_on:
+      mariadb:
+        condition: service_healthy
+  p2p_chat_service:
+    build:
+      context: service/p2p_chat_service
+      dockerfile: Dockerfile
+    container_name: p2p_chat_service
+    environment:
+      - DB_HOST=mariadb
+      - DB_PORT=3306
+      - DB_LOGIN=test_admin
+      - DB_PASSWORD=password
+      - DB_DATABASE=messenger
+      - SERVICE_PORT=8082
+      - LD_LIBRARY_PATH=/usr/local/lib
+    ports:
+      - 8082:8082
+    networks:
+      - arch-network
+    depends_on:
+      mariadb:
+        condition: service_healthy
+  other_service:
+    build:
+      context: service/other_service
+      dockerfile: Dockerfile
+    container_name: other_service
+    environment:
+      - SERVICE_HOST=authorization_service
+      - SERVICE_PORT=8083
+      - LD_LIBRARY_PATH=/usr/local/lib
+    ports:
+      - 8083:8083
     networks:
       - arch-network
 

@@ -14,7 +14,6 @@ class ChatUserTable : public Table<ChatUser>,
   virtual void Create() override;
   virtual void SaveToMySQL(ChatUser &chatUser) override;
 
-  void AddUserToChat(uint64_t chatId, uint64_t userId);
   std::vector<uint64_t> GetChatUsers(uint64_t chatId);
  private:
   friend Singleton<ChatUserTable>;

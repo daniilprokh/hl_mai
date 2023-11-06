@@ -55,6 +55,10 @@ void UserTable::SaveToMySQL(User& user) {
   SessionOperation<void>(
     [this, &user](Poco::Data::Session& session) {
       this->Insertion(session, user);
+
+      if (auto id = GetLastId(session)) {
+        user.set<kUserId>(id.value());
+      }
     }
   );
 }

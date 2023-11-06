@@ -42,6 +42,10 @@ void MessageTable::SaveToMySQL(Message &message) {
           use(message.get<kMessageText>()),
           use(message.get<kMessageDateTime>()),
           now;
+
+      if (auto id = GetLastId(session)) {
+        message.set<kMessageId>(id.value());
+      }
     }
   );
 }
@@ -51,16 +55,18 @@ std::optional<uint64_t> MessageTable::AddChatMessage(
     uint64_t userId,
     std::string &messageText) {
   return SessionOperation<std::optional<uint64_t>>(
-    [this, &chatId, &userId, &messageText](Poco::Data::Session& session) {
+    [this, &chatId, &userId, &messageText](Poco::Data::Session &session) {
       Poco::Data::Statement insert(session);
       insert << "INSERT INTO %s "
-                "(chat_id,user_id,text) "
+                "(chat_id, user_id, text) "
                 "VALUES(?, ?, ?)",
           this->kName,
-          use(chatId), use(userId), use(messageText),
+          use(chatId),
+          use(userId),
+          use(messageText),
           now;
 
-      return this->GetLastId(session);
+      return GetLastId(session);
     }
   );
 }
@@ -75,7 +81,6 @@ std::vector<Message> MessageTable::GetChatMessages(uint64_t chatId) {
           this->kName,
           into(result),
           use(chatId),
-          range(0, 1),
           now;
       return result;
     }

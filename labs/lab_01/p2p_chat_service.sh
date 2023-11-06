@@ -3,7 +3,8 @@ export DB_PORT=3306
 export DB_LOGIN=test_admin
 export DB_PASSWORD=password
 export DB_DATABASE=messenger
+export SERVICE_PORT=8082
 
 export LD_LIBRARY_PATH=/usr/local/lib
 
-../../build/labs/lab_01/lab_01_web_service
+../../build/labs/lab_01/lab_01_p2p_chat_service

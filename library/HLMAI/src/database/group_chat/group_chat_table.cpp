@@ -35,22 +35,10 @@ void GroupChatTable::SaveToMySQL(GroupChat &groupChat) {
           this->kName,
           use(groupChat.get<kGroupChatTitle>()),
           now;
-    }
-  );
-}
 
-std::optional<uint64_t> GroupChatTable::AddGroupChat(std::string &title) {
-  return SessionOperation<std::optional<uint64_t>>(
-    [this, &title](Poco::Data::Session &session) {
-      Poco::Data::Statement insert(session);
-      insert << "INSERT INTO %s "
-                "(title) "
-                "VALUES(?)",
-          this->kName,
-          use(title),
-          now;
-
-      return this->GetLastId(session);
+      if (auto id = this->GetLastId(session)) {
+        groupChat.set<kGroupChatId>(id.value());
+      }
     }
   );
 }

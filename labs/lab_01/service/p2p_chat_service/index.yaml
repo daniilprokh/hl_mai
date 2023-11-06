@@ -1,21 +1,21 @@
 openapi: '3.0.0'
 
 info:
-  title: "Group Chat Service API"
+  title: "P2p Chat Service API"
   description: "API для задания по курсу Архитектура программных систем"
   version: "1.0"
 
 servers:
-- url: "http://localhost:8081"
-  description: "Group Chat Server"
+- url: "http://localhost:8082"
+  description: "P2p Chat Server"
 
 paths:
   /add/message:
     post:
-      summary: "Добавление сообщения в групповой чат"
+      summary: "Добавление сообщения в P2P чат"
       parameters:
-        - $ref: '#/components/parameters/chat_id'
-        - $ref: '#/components/parameters/user_id'
+        - $ref: '#/components/parameters/sender_id'
+        - $ref: '#/components/parameters/receiver_id'
         - $ref: '#/components/parameters/text'
       responses:
         200:
@@ -41,36 +41,16 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Error'
-  /add/user:
-    post:
-      summary: "Добавление пользователя в групповой чат"
-      parameters:
-        - $ref: '#/components/parameters/user_id'
-        - $ref: '#/components/parameters/chat_id'
-      responses:
-        200:
-          description: "Пользователь добавлен"
-        400:
-          description: "Ошибка в параметрах запроса"
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-        500:
-          description: "Неожиданная ошибка"
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
+                $ref: '#/components/schemas/Error'    
   /create:
     post:
-      summary: "Создание группового чата"
+      summary: "Создание P2P чата"
       parameters:
-        - $ref: '#/components/parameters/title'
+        - $ref: '#/components/parameters/user_id1'
+        - $ref: '#/components/parameters/user_id2'
       responses:
         200:
-          description: "Идентификатор созданного группового чата"
+          description: "Идентификатор созданного P2P чата"
           content:
             application/json:
               schema:
@@ -89,12 +69,13 @@ paths:
                 $ref: '#/components/schemas/Error'
   /load:
     get:
-      summary: "Загрузка сообщений группового чата"
+      summary: "Загрузка сообщений P2P чата"
       parameters:
-        - $ref: '#/components/parameters/chat_id'
+        - $ref: '#/components/parameters/user_id1'
+        - $ref: '#/components/parameters/user_id2'
       responses:
         200:
-          description: "Загруженные сообщения группового чата"
+          description: "Загруженные сообщения P2P чата"
           content:
             application/json:
               schema:
@@ -119,37 +100,44 @@ paths:
                 $ref: '#/components/schemas/Error'
 
 components:
-
+  
   parameters:
-    user_id:
-      name: user_id
-      description: "Уникальный идентификатор пользователя"
+    user_id1:
+      name: user_id1
+      description: "Уникальный идентификатор первого пользователя"
       in: query
       required: true
       schema:
         type: integer
-    chat_id:
-      name: chat_id
-      description: "Уникальный идентификатор группового чата"
+    user_id2:
+      name: user_id2
+      description: "Уникальный идентификатор второго пользователя"
       in: query
       required: true
       schema:
         type: integer
-    text:
+    sender_id:
+      name: sender_id
+      description: "Уникальный идентификатор отправителя сообщения"
+      in: query
+      required: true
+      schema:
+        type: integer
+    receiver_id:
+      name: receiver_id
+      description: "Уникальный идентификатор получателя сообщения"
+      in: query
+      required: true
+      schema:
+        type: integer
+    text: 
       name: text
       description: "Текст сообщения"
       in: query
       required: true
       schema:
         type: string
-    title:
-      name: title
-      description: "Название группового чата"
-      in: query
-      required: true
-      schema:
-        type: string
-
+  
   schemas:
     message:
       type: object
@@ -180,4 +168,3 @@ components:
         message:
           description: "Сообщение о ошибке"
           type: string
-  

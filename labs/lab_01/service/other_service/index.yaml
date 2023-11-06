@@ -1,0 +1,37 @@
+openapi: '3.0.0'
+
+info:
+  title: "Other Service API"
+  description: "API для задания по курсу Архитектура программных систем"
+  version: "1.0"
+
+servers:
+- url: "http://localhost:8083"
+  description: "Other Server"
+
+paths:
+  /auth:
+    get:
+      summary: "Проверка аунтефикации"
+      responses:
+        200:
+          description: "Идентификатор пользователя"
+          content:
+            application/json:
+              schema:
+               type: string
+        401:
+          description: "Отсутствие аутентификации"
+          content:
+            application/json:
+              schema:
+                type: string
+
+components:
+  securitySchemes:
+      basicAuth:     
+        type: http
+        scheme: basic
+
+security:
+  - basicAuth: []
