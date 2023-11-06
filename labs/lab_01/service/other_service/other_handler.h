@@ -14,6 +14,8 @@
 #include <Poco/Base64Encoder.h>
 #include <Poco/URI.h>
 
+#include <optional>
+
 class OtherHandler : public Poco::Net::HTTPRequestHandler
 {
  public:
