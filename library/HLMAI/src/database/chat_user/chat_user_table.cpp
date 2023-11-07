@@ -44,12 +44,19 @@ std::vector<uint64_t> ChatUserTable::GetChatUsers(uint64_t chatId) {
     [this, &chatId](Poco::Data::Session &session) {
       Poco::Data::Statement select(session);
       std::vector<uint64_t> user_ids;
-      select << "SELECT user_id FROM %s"
+      uint64_t user_id;
+      select << "SELECT user_id FROM %s "
                 "WHERE chat_id = ?",
           this->kName,
-          into(user_ids),
+          into(user_id),
           use(chatId),
-          now;
+          range(0, 1);
+      
+      while (!select.done()) {
+        select.execute();
+        user_ids.push_back(user_id);
+      }
+
       return user_ids;
     }
   );

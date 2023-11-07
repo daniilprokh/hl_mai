@@ -82,6 +82,7 @@ class P2pChatHandler : public Poco::Net::HTTPRequestHandler {
 
         std::ostream &ostr = response.send();
         Poco::JSON::Stringifier::stringify(root, ostr);
+        return;
       }
       auto user_id2 = GetUserId(form.get(properties[1]));
       if (!user_id2.has_value()) {
@@ -95,6 +96,7 @@ class P2pChatHandler : public Poco::Net::HTTPRequestHandler {
 
         std::ostream &ostr = response.send();
         Poco::JSON::Stringifier::stringify(root, ostr);
+        return;
       }
 
       database::P2pChat p2p_chat;
@@ -142,36 +144,37 @@ class P2pChatHandler : public Poco::Net::HTTPRequestHandler {
       
       std::ostream &ostr = response.send();
       Poco::JSON::Stringifier::stringify(root, ostr);
-
       return;
     }
 
     auto sender_id = GetUserId(form.get(properties[0]));
-      if (!sender_id.has_value()) {
-        response.setStatus(Poco::Net::HTTPResponse::HTTP_NOT_FOUND);
+    if (!sender_id.has_value()) {
+      response.setStatus(Poco::Net::HTTPResponse::HTTP_NOT_FOUND);
 
-        Poco::JSON::Object::Ptr root = new Poco::JSON::Object();
-        root->set("type", "/errors/not_found");
-        root->set("title", "Internal exception");
-        root->set("detail", "user with given sender_login not found");
-        root->set("instance", "/add/message");
+      Poco::JSON::Object::Ptr root = new Poco::JSON::Object();
+      root->set("type", "/errors/not_found");
+      root->set("title", "Internal exception");
+      root->set("detail", "user with given sender_login not found");
+      root->set("instance", "/add/message");
 
-        std::ostream &ostr = response.send();
-        Poco::JSON::Stringifier::stringify(root, ostr);
-      }
-      auto receiver_id = GetUserId(form.get(properties[1]));
-      if (!receiver_id.has_value()) {
-        response.setStatus(Poco::Net::HTTPResponse::HTTP_NOT_FOUND);
+      std::ostream &ostr = response.send();
+      Poco::JSON::Stringifier::stringify(root, ostr);
+      return;
+    }
+    auto receiver_id = GetUserId(form.get(properties[1]));
+    if (!receiver_id.has_value()) {
+      response.setStatus(Poco::Net::HTTPResponse::HTTP_NOT_FOUND);
 
-        Poco::JSON::Object::Ptr root = new Poco::JSON::Object();
-        root->set("type", "/errors/not_found");
-        root->set("title", "Internal exception");
-        root->set("detail", "user with given receiver_login not found");
-        root->set("instance", "/add/message");
+      Poco::JSON::Object::Ptr root = new Poco::JSON::Object();
+      root->set("type", "/errors/not_found");
+      root->set("title", "Internal exception");
+      root->set("detail", "user with given receiver_login not found");
+      root->set("instance", "/add/message");
 
-        std::ostream &ostr = response.send();
-        Poco::JSON::Stringifier::stringify(root, ostr);
-      }
+      std::ostream &ostr = response.send();
+      Poco::JSON::Stringifier::stringify(root, ostr);
+      return;
+    }
 
     auto chat_id = database::P2pChatTable::GetInstance().GetP2pChatId(
         sender_id.value(),
@@ -256,6 +259,7 @@ class P2pChatHandler : public Poco::Net::HTTPRequestHandler {
 
         std::ostream &ostr = response.send();
         Poco::JSON::Stringifier::stringify(root, ostr);
+        return;
       }
       auto user_id2 = GetUserId(form.get(properties[1]));
       if (!user_id2.has_value()) {
@@ -269,6 +273,7 @@ class P2pChatHandler : public Poco::Net::HTTPRequestHandler {
 
         std::ostream &ostr = response.send();
         Poco::JSON::Stringifier::stringify(root, ostr);
+        return;
       }
 
     auto chat_id = database::P2pChatTable::GetInstance().GetP2pChatId(
@@ -319,7 +324,7 @@ class P2pChatHandler : public Poco::Net::HTTPRequestHandler {
     }
   }
 
-    std::optional<uint64_t> GetUserId(const std::string &login) {
+  std::optional<uint64_t> GetUserId(const std::string &login) {
     char* port_env = std::getenv("AUTH_PORT");
     if (!port_env) {
       return std::nullopt;

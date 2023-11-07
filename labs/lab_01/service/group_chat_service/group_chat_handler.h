@@ -20,6 +20,9 @@
 #include <Poco/Net/HTTPServerResponse.h>
 #include <Poco/URI.h>
 
+#include <algorithm>
+#include <iostream>
+
 class GroupChatHandler : public Poco::Net::HTTPRequestHandler {
  public:
   GroupChatHandler(const std::string &format) : format_(format)
@@ -103,23 +106,44 @@ class GroupChatHandler : public Poco::Net::HTTPRequestHandler {
 
       std::ostream &ostr = response.send();
       Poco::JSON::Stringifier::stringify(root, ostr);
+      return;
+    }
+
+    uint64_t chat_id = stoull(form.get(properties[0]));
+
+    auto &chat_user_table = database::ChatUserTable::GetInstance();
+    std::vector<uint64_t> user_ids = chat_user_table.GetChatUsers(chat_id);
+    if (std::find(user_ids.begin(),
+                  user_ids.end(),
+                  user_id.value()) == user_ids.end()) {
+      response.setStatus(Poco::Net::HTTPResponse::HTTP_NOT_FOUND);
+
+      Poco::JSON::Object::Ptr root = new Poco::JSON::Object();
+      root->set("type", "/errors/not_found");
+      root->set("title", "Internal exception");
+      root->set("detail", "user with given login not found in chat");
+      root->set("instance", "/add/message");
+
+      std::ostream &ostr = response.send();
+      Poco::JSON::Stringifier::stringify(root, ostr);
+      return;
     }
 
     auto &group_chat_message_table =
         database::GroupChatMessageTable::GetInstance();
     std::string text = form.get(properties[2]);
-    auto chat_id = group_chat_message_table.AddChatMessage(
-        stoull(form.get(properties[0])),
+    auto message_id = group_chat_message_table.AddChatMessage(
+        chat_id,
         user_id.value(),
         text
     );
 
-    if (chat_id.has_value()) {
+    if (message_id.has_value()) {
       response.setStatus(Poco::Net::HTTPResponse::HTTP_OK);
       response.setContentType("application/json");
 
       std::ostream &ostr = response.send();
-      ostr << chat_id.value();
+      ostr << message_id.value();
     } else {
       response.setStatus(Poco::Net::HTTPResponse::HTTP_NOT_FOUND);
 
@@ -154,6 +178,7 @@ class GroupChatHandler : public Poco::Net::HTTPRequestHandler {
 
         std::ostream &ostr = response.send();
         Poco::JSON::Stringifier::stringify(root, ostr);
+        return;
       }
 
       database::ChatUser chat_user;
