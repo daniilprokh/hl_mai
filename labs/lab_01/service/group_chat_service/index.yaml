@@ -15,7 +15,7 @@ paths:
       summary: "Добавление сообщения в групповой чат"
       parameters:
         - $ref: '#/components/parameters/chat_id'
-        - $ref: '#/components/parameters/user_id'
+        - $ref: '#/components/parameters/login'
         - $ref: '#/components/parameters/text'
       responses:
         200:
@@ -46,7 +46,7 @@ paths:
     post:
       summary: "Добавление пользователя в групповой чат"
       parameters:
-        - $ref: '#/components/parameters/user_id'
+        - $ref: '#/components/parameters/login'
         - $ref: '#/components/parameters/chat_id'
       responses:
         200:
@@ -121,13 +121,13 @@ paths:
 components:
 
   parameters:
-    user_id:
-      name: user_id
-      description: "Уникальный идентификатор пользователя"
+    login:
+      name: login
+      description: "Логин пользователя"
       in: query
       required: true
       schema:
-        type: integer
+        type: string
     chat_id:
       name: chat_id
       description: "Уникальный идентификатор группового чата"

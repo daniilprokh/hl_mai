@@ -38,9 +38,14 @@ class AutorizationHandler : public Poco::Net::HTTPRequestHandler {
           HandleAuthorizationRequest(request, response);
           return;
         }
-        else if (ContainsSubstr(uri, "/search"))
+        else if (ContainsSubstr(uri, "/search/login"))
         {
-          HandleSearchRequest(form, response);
+          HandleSearchByLoginRequest(form, response);
+          return;
+        }
+        else if (ContainsSubstr(uri, "/search/mask"))
+        {
+          HandleSearchByMaskRequest(form, response);
           return;
         }
       } else if (method == Poco::Net::HTTPRequest::HTTP_POST) {
@@ -206,8 +211,49 @@ class AutorizationHandler : public Poco::Net::HTTPRequestHandler {
     Poco::JSON::Stringifier::stringify(root, ostr);
   }
 
-  void HandleSearchRequest(const Poco::Net::HTMLForm &form,
-                           Poco::Net::HTTPServerResponse &response) {
+  void HandleSearchByLoginRequest(const Poco::Net::HTMLForm &form,
+                                  Poco::Net::HTTPServerResponse &response) {
+    std::string property = "login";
+    std::string bad_request_message;
+    if (!CheckHtmlForm(form, property, bad_request_message)) {
+      response.setStatus(Poco::Net::HTTPResponse::HTTP_BAD_REQUEST);
+      response.setContentType("application/json");
+
+      Poco::JSON::Object::Ptr root = new Poco::JSON::Object();
+      root->set("type", "/errors/bad_request");
+      root->set("title", "Internal exception");
+      root->set("detail", bad_request_message);
+      root->set("instance", "/search/login");
+      
+      std::ostream &ostr = response.send();
+      Poco::JSON::Stringifier::stringify(root, ostr);
+      return;
+    }
+
+    std::string login = form.get(property);
+    auto user_id = database::UserTable::GetInstance().GetUserId(login);
+    if (user_id.has_value()) {
+      response.setStatus(Poco::Net::HTTPResponse::HTTP_OK);
+      response.setContentType("application/json");
+
+      std::ostream &ostr = response.send();
+      ostr << user_id.value();
+    } else {
+      response.setStatus(Poco::Net::HTTPResponse::HTTP_NOT_FOUND);
+
+      Poco::JSON::Object::Ptr root = new Poco::JSON::Object();
+      root->set("type", "/errors/not_found");
+      root->set("title", "Internal exception");
+      root->set("detail", "users not found");
+      root->set("instance", "/search");
+
+      std::ostream &ostr = response.send();
+      Poco::JSON::Stringifier::stringify(root, ostr);
+    }
+  }
+
+  void HandleSearchByMaskRequest(const Poco::Net::HTMLForm &form,
+                                 Poco::Net::HTTPServerResponse &response) {
     const std::vector<std::string> properties {
       "first_name",
       "last_name"
@@ -238,7 +284,7 @@ class AutorizationHandler : public Poco::Net::HTTPRequestHandler {
       root->set("type", "/errors/not_found");
       root->set("title", "Internal exception");
       root->set("detail", "users not found");
-      root->set("instance", "/search");
+      root->set("instance", "/search/mask");
 
       std::ostream &ostr = response.send();
       Poco::JSON::Stringifier::stringify(root, ostr);

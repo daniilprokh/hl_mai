@@ -14,8 +14,8 @@ paths:
     post:
       summary: "Добавление сообщения в P2P чат"
       parameters:
-        - $ref: '#/components/parameters/sender_id'
-        - $ref: '#/components/parameters/receiver_id'
+        - $ref: '#/components/parameters/sender_login'
+        - $ref: '#/components/parameters/receiver_login'
         - $ref: '#/components/parameters/text'
       responses:
         200:
@@ -46,8 +46,8 @@ paths:
     post:
       summary: "Создание P2P чата"
       parameters:
-        - $ref: '#/components/parameters/user_id1'
-        - $ref: '#/components/parameters/user_id2'
+        - $ref: '#/components/parameters/login1'
+        - $ref: '#/components/parameters/login2'
       responses:
         200:
           description: "Идентификатор созданного P2P чата"
@@ -71,8 +71,8 @@ paths:
     get:
       summary: "Загрузка сообщений P2P чата"
       parameters:
-        - $ref: '#/components/parameters/user_id1'
-        - $ref: '#/components/parameters/user_id2'
+        - $ref: '#/components/parameters/login1'
+        - $ref: '#/components/parameters/login2'
       responses:
         200:
           description: "Загруженные сообщения P2P чата"
@@ -102,34 +102,34 @@ paths:
 components:
   
   parameters:
-    user_id1:
-      name: user_id1
-      description: "Уникальный идентификатор первого пользователя"
+    login1:
+      name: login1
+      description: "Логин первого пользователя"
       in: query
       required: true
       schema:
-        type: integer
-    user_id2:
-      name: user_id2
-      description: "Уникальный идентификатор второго пользователя"
+        type: string
+    login2:
+      name: login2
+      description: "Логин второго пользователя"
       in: query
       required: true
       schema:
-        type: integer
-    sender_id:
-      name: sender_id
-      description: "Уникальный идентификатор отправителя сообщения"
+        type: string
+    sender_login:
+      name: sender_login
+      description: "Логин отправителя сообщения"
       in: query
       required: true
       schema:
-        type: integer
-    receiver_id:
-      name: receiver_id
-      description: "Уникальный идентификатор получателя сообщения"
+        type: string
+    receiver_login:
+      name: receiver_login
+      description: "Логин получателя сообщения"
       in: query
       required: true
       schema:
-        type: integer
+        type: string
     text: 
       name: text
       description: "Текст сообщения"

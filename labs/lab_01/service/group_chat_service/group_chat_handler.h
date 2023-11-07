@@ -12,12 +12,13 @@
 #include <HLMAI/contains_substr.h>
 
 #include <Poco/JSON/Object.h>
-
 #include <Poco/Net/HTMLForm.h>
 #include <Poco/Net/HTTPRequest.h>
+#include <Poco/Net/HTTPClientSession.h>
 #include <Poco/Net/HTTPRequestHandler.h>
 #include <Poco/Net/HTTPServerRequest.h>
 #include <Poco/Net/HTTPServerResponse.h>
+#include <Poco/URI.h>
 
 class GroupChatHandler : public Poco::Net::HTTPRequestHandler {
  public:
@@ -70,7 +71,7 @@ class GroupChatHandler : public Poco::Net::HTTPRequestHandler {
                                     Poco::Net::HTTPServerResponse &response) {
     const std::vector<std::string> properties {
       "chat_id",
-      "user_id",
+      "login",
       "text"
     };
     std::string bad_request_message;
@@ -90,12 +91,26 @@ class GroupChatHandler : public Poco::Net::HTTPRequestHandler {
       return;
     }
 
+    auto user_id = GetUserId(form.get(properties[1]));
+    if (!user_id.has_value()) {
+      response.setStatus(Poco::Net::HTTPResponse::HTTP_NOT_FOUND);
+
+      Poco::JSON::Object::Ptr root = new Poco::JSON::Object();
+      root->set("type", "/errors/not_found");
+      root->set("title", "Internal exception");
+      root->set("detail", "user with given login not found");
+      root->set("instance", "/add/message");
+
+      std::ostream &ostr = response.send();
+      Poco::JSON::Stringifier::stringify(root, ostr);
+    }
+
     auto &group_chat_message_table =
         database::GroupChatMessageTable::GetInstance();
     std::string text = form.get(properties[2]);
     auto chat_id = group_chat_message_table.AddChatMessage(
         stoull(form.get(properties[0])),
-        stoull(form.get(properties[1])),
+        user_id.value(),
         text
     );
 
@@ -122,14 +137,27 @@ class GroupChatHandler : public Poco::Net::HTTPRequestHandler {
   void HandleAdditionUserRequest(const Poco::Net::HTMLForm &form,
                                  Poco::Net::HTTPServerResponse &response) {
     const std::vector<std::string> properties {
-      "user_id",
+      "login",
       "chat_id"
     };
     std::string bad_request_message;
     if (CheckHtmlForm(form, properties, bad_request_message)) {
+      auto user_id = GetUserId(form.get(properties[0]));
+      if (!user_id.has_value()) {
+        response.setStatus(Poco::Net::HTTPResponse::HTTP_NOT_FOUND);
+
+        Poco::JSON::Object::Ptr root = new Poco::JSON::Object();
+        root->set("type", "/errors/not_found");
+        root->set("title", "Internal exception");
+        root->set("detail", "user with given login not found");
+        root->set("instance", "/add/user");
+
+        std::ostream &ostr = response.send();
+        Poco::JSON::Stringifier::stringify(root, ostr);
+      }
+
       database::ChatUser chat_user;
-      chat_user.set<database::kChatUserId>(
-          std::stoull(form.get(properties[0])));
+      chat_user.set<database::kChatUserId>(user_id.value());
       chat_user.set<database::kChatUserChatId>(
           std::stoull(form.get(properties[1])));
 
@@ -229,6 +257,36 @@ class GroupChatHandler : public Poco::Net::HTTPRequestHandler {
       std::ostream &ostr = response.send();
       Poco::JSON::Stringifier::stringify(arr, ostr);
     }
+  }
+
+  std::optional<uint64_t> GetUserId(const std::string &login) {
+    char* port_env = std::getenv("AUTH_PORT");
+    if (!port_env) {
+      return std::nullopt;
+    }
+    std::string port = port_env;
+
+    char* host_env = std::getenv("AUTH_HOST");
+    std::string host = host_env ? host_env : "localhost";
+
+    std::string url = Poco::format("http://%s:%s/search/login?login=%s",
+                                   host, port, login);
+
+    Poco::URI uri(url);
+    Poco::Net::HTTPClientSession s(uri.getHost(), uri.getPort());
+    Poco::Net::HTTPRequest request(Poco::Net::HTTPRequest::HTTP_GET,
+                                   uri.toString());
+    s.sendRequest(request);
+
+    Poco::Net::HTTPResponse response;
+    std::istream &rs = s.receiveResponse(response);
+    if (response.getStatus() != 200) {
+      return std::nullopt;
+    }
+
+    uint64_t user_id;
+    rs >> user_id;
+    return user_id;
   }
   
   std::string format_;

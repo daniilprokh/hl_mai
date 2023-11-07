@@ -17,11 +17,11 @@ class UserTable : public Table<User>,
   void SaveToMySQL(User& user) override;
 
   std::optional<User> ReadById(uint64_t id);
-  std::optional<uint64_t> GetUserId(std::string login);
-  std::optional<uint64_t> Authorize(std::string login,
-                                    std::string password);
+  std::optional<uint64_t> GetUserId(std::string &login);
+  std::optional<uint64_t> Authorize(std::string &login,
+                                    std::string &password);
   std::vector<User> Search(std::string firstName,
-                            std::string lastName);
+                           std::string lastName);
 
   void Preload(const std::string &filePath);
  private:

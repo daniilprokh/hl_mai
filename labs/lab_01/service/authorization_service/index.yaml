@@ -15,7 +15,7 @@ paths:
       summary: "Проверка аутентификации"
       responses:
         200:
-          description: User ID
+          description: "Идентификатор пользователя"
           content:
             application/json:
               schema:
@@ -26,7 +26,37 @@ paths:
             application/json:
               schema:
                 type: string
-  /search:
+  /search/login:
+    get:
+      summary: "Поиск пользователя по логину"
+      parameters:
+        - $ref: '#/components/parameters/login'
+      responses:
+        200:
+          description: "Идентификатор найденного пользователя"
+          content:
+            application/json:
+              schema:
+                type: integer
+        400:
+          description: "Ошибка в параметрах запроса"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        404:
+          description: "Пользователь с указаным логином не найден"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        500:
+          description: "Неожиданная ошибка"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /search/mask:
     get:
       summary: "Поиск пользователей по маске имени и фамилии"
       parameters:

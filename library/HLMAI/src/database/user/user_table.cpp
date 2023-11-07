@@ -81,7 +81,7 @@ std::optional<User> UserTable::ReadById(uint64_t id) {
   );
 }
 
-std::optional<uint64_t> UserTable::GetUserId(std::string login) {
+std::optional<uint64_t> UserTable::GetUserId(std::string &login) {
   return SessionOperation<std::optional<uint64_t>>(
     [this, &login](Poco::Data::Session& session) {
       Poco::Data::Statement select(session);
@@ -100,8 +100,8 @@ std::optional<uint64_t> UserTable::GetUserId(std::string login) {
   );
 }
 
-std::optional<uint64_t> UserTable::Authorize(std::string login,
-                                             std::string password) {
+std::optional<uint64_t> UserTable::Authorize(std::string &login,
+                                             std::string &password) {
   return SessionOperation<std::optional<uint64_t>>(
     [this, &login, &password](Poco::Data::Session& session) {
       Poco::Data::Statement select(session);
