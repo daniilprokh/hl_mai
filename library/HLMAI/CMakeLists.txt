@@ -46,6 +46,7 @@ set(PUBLIC_HEADERS
   include/HLMAI/database/user/user.h
   include/HLMAI/database/user/user_feature.h
   include/HLMAI/database/user/user_converter.h
+  include/HLMAI/database/user/user_table_shard.h
   include/HLMAI/database/user/user_table.h
   include/HLMAI/database/user/user.h
   include/HLMAI/database/database.h
@@ -70,6 +71,7 @@ set(SOURCES ${PUBLIC_HEADERS}
   src/database/p2p_chat/p2p_chat_converter.cpp
   src/database//p2p_chat/p2p_chat_table.cpp
   src/database/user/user_converter.cpp
+  src/database/user/user_table_shard.cpp
   src/database/user/user_table.cpp
   src/database/database.cpp
   src/cache.cpp

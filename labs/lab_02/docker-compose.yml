@@ -87,17 +87,19 @@ services:
       - "6033:6033"
       # Mysql Admin Port
       - "6032:6032"
-  authorization_server:
+  authorization_service:
     build:
-      context: authorization_server
+      context: authorization_service
       dockerfile: Dockerfile
-    container_name: authorization_server
+    container_name: authorization_service
     environment:
       - DB_HOST=proxysql
       - DB_PORT=6033
       - DB_LOGIN=test_admin
       - DB_PASSWORD=password
       - DB_DATABASE=messenger
+      - SERVICE_PORT=8080
+      - LD_LIBRARY_PATH=/usr/local/lib
     ports:
       - 8080:8080
     networks:

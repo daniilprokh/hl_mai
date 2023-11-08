@@ -2,7 +2,7 @@
 #define AUTHORIZATION_HANDLER_H_HL_MAI
 
 #include <HLMAI/database/user/user_converter.h>
-#include <HLMAI/database/user/user_table.h>
+#include <HLMAI/database/user/user_table_shard.h>
 #include <HLMAI/identity.h>
 #include <HLMAI/check_html_form.h>
 #include <HLMAI/contains_substr.h>
@@ -140,7 +140,7 @@ class AutorizationHandler : public Poco::Net::HTTPRequestHandler {
 
     uint64_t id = stoull(form.get(property));
     std::optional<database::User> result =
-        database::UserTable::GetInstance().ReadById(id);
+        database::UserTableShard::GetInstance().ReadById(id);
     if (result.has_value())
     {
       response.setStatus(Poco::Net::HTTPResponse::HTTP_OK);
@@ -185,7 +185,7 @@ class AutorizationHandler : public Poco::Net::HTTPRequestHandler {
     {
       GetIdentity(info, login, password);
       std::optional<uint64_t> id = 
-          database::UserTable::GetInstance().Authorize(login, password);
+          database::UserTableShard::GetInstance().Authorize(login, password);
       if (id.has_value())
       {
         response.setStatus(Poco::Net::HTTPResponse::HTTP_OK);
@@ -231,7 +231,7 @@ class AutorizationHandler : public Poco::Net::HTTPRequestHandler {
     }
 
     std::string login = form.get(property);
-    auto user_id = database::UserTable::GetInstance().GetUserId(login);
+    auto user_id = database::UserTableShard::GetInstance().GetUserId(login);
     if (user_id.has_value()) {
       response.setStatus(Poco::Net::HTTPResponse::HTTP_OK);
       response.setContentType("application/json");
@@ -276,7 +276,7 @@ class AutorizationHandler : public Poco::Net::HTTPRequestHandler {
 
     std::string fn = form.get(properties[0]);
     std::string ln = form.get(properties[1]);
-    auto results = database::UserTable::GetInstance().Search(fn, ln);
+    auto results = database::UserTableShard::GetInstance().Search(fn, ln);
     if (results.empty()) {
       response.setStatus(Poco::Net::HTTPResponse::HTTP_NOT_FOUND);
 
@@ -333,7 +333,7 @@ class AutorizationHandler : public Poco::Net::HTTPRequestHandler {
       cheker.Check(user, message);
       if (message.empty())
       {
-        database::UserTable::GetInstance().SaveToMySQL(user);
+        database::UserTableShard::GetInstance().SaveToMySQL(user);
 
         response.setStatus(Poco::Net::HTTPResponse::HTTP_OK);
         response.setContentType("application/json");

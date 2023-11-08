@@ -4,7 +4,7 @@
 #include "authorization_handler.h"
 
 #include <HLMAI/contains_substr.h>
-#include <HLMAI/database/user/user_table.h>
+#include <HLMAI/database/user/user_table_shard.h>
 
 #include <Poco/Net/HTTPRequestHandler.h>
 #include <Poco/Net/HTTPRequestHandlerFactory.h>
@@ -19,7 +19,7 @@ class HTTPAutorizationRequestFactory :
   HTTPAutorizationRequestFactory(const std::string& format)
     : format_(format)
   {
-    database::UserTable::GetInstance().Create();
+    database::UserTableShard::GetInstance().Create();
   }
 
   Poco::Net::HTTPRequestHandler* createRequestHandler(
