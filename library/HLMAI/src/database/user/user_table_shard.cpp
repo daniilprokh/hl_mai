@@ -18,14 +18,12 @@ UserTableShard::UserTableShard()
 
 uint64_t UserTableShard::GetNextId(Poco::Data::Session &session) {
   Poco::Data::Statement insert(session);
-  insert << "INSERT INTO RealId values();";
-  insert.execute();
+  insert << "INSERT INTO real_id values();", now;
 
   auto id = GetLastId(session);
 
   Poco::Data::Statement d(session);
-  d << "DELETE FROM RealId;";
-  d.execute();
+  d << "DELETE FROM real_id;", now;
 
   return id.value();
 }

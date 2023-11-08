@@ -268,7 +268,7 @@ class AutorizationHandler : public Poco::Net::HTTPRequestHandler {
       root->set("type", "/errors/bad_request");
       root->set("title", "Internal exception");
       root->set("detail", bad_request_message);
-      root->set("instance", "/search");
+      root->set("instance", "/search/mask");
       
       std::ostream &ostr = response.send();
       Poco::JSON::Stringifier::stringify(root, ostr);
