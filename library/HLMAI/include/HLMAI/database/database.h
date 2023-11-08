@@ -24,6 +24,7 @@ class Database : public Singleton<Database>  {
     const HandleSession<SessionResult> &handleSession,
     std::ostream &errorOutput = std::cout);
 
+  uint8_t GetNodeCount() const { return kNodeCount; }
   std::vector<std::string> GetShardingHints();
   std::string GetUserShardingHint(uint64_t userId);
  private:

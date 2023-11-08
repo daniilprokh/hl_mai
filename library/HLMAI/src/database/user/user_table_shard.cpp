@@ -18,14 +18,24 @@ UserTableShard::UserTableShard()
 {}
 
 uint64_t UserTableShard::GetNextId(Poco::Data::Session &session) {
+  uint64_t count;
+  Poco::Data::Statement select_count(session);
+  select_count << "SELECT COUNT(*) FROM real_ids",
+      into(count),
+      now;
+  auto &database = database::Database::GetInstance();
+  uint8_t shard = count % database.GetNodeCount();
+
   Poco::Data::Statement insert(session);
-  insert << "INSERT INTO real_ids (id) VALUES(NULL)", now;
+  insert << "INSERT INTO real_ids (shard) VALUES(?)",
+      use(shard),
+      now;
 
   uint64_t id;
-  Poco::Data::Statement select(session);
-  select << "SELECT id FROM real_ids "
-            "ORDER BY id DESC "
-            "LIMIT 1",
+  Poco::Data::Statement select_id(session);
+  select_id << "SELECT id FROM real_ids "
+               "ORDER BY id DESC "
+               "LIMIT 1",
       into(id),
       now;
   std::cout << "next_id: " << id << std::endl;
@@ -81,7 +91,8 @@ void UserTableShard::Create() {
       Poco::Data::Statement create_stmt(session);
       create_stmt << "CREATE TABLE IF NOT EXISTS real_ids ("
                   << "PRIMARY KEY (id),"
-                  << "id INT NOT NULL AUTO_INCREMENT);",
+                  << "id    INT NOT NULL AUTO_INCREMENT,"
+                  << "shard INT NOT NULL);",
           now;
     } 
   );
