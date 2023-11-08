@@ -6,6 +6,7 @@
 #include <Poco/JSON/Parser.h>
 
 #include <fstream>
+#include <iostream>
 
 using namespace Poco::Data::Keywords;
 
@@ -18,12 +19,12 @@ UserTableShard::UserTableShard()
 
 uint64_t UserTableShard::GetNextId(Poco::Data::Session &session) {
   Poco::Data::Statement insert(session);
-  insert << "INSERT INTO real_id values();", now;
+  insert << "INSERT INTO real_ids VALUES();", now;
 
   auto id = GetLastId(session);
-
-  Poco::Data::Statement d(session);
-  d << "DELETE FROM real_id;", now;
+  std::cout << id.value_or(-1);
+  //Poco::Data::Statement d(session);
+  //d << "DELETE FROM real_id;", now;
 
   return id.value();
 }
@@ -34,16 +35,18 @@ void UserTableShard::Insertion(Poco::Data::Session &session, User &user) {
   std::string hint = database.GetUserShardingHint(next_id);
   Poco::Data::Statement insert(session);
   insert << "INSERT INTO %s "
-            "(first_name,last_name,email,login,password) "
-            "VALUES(?, ?, ?, ?, ?) %s",
+            "(user_id, first_name, last_name, email, login, password) "
+            "VALUES(?, ?, ?, ?, ?, ?) %s",
       kName,
       hint,
+      use(next_id),
       use(user.get<kUserFirstName>()),
       use(user.get<kUserLastName>()),
       use(user.get<kUserEmail>()),
       use(user.get<KUserLogin>()),
       use(user.get<kUserPassword>()),
       now;
+  user.set<kUserId>(next_id);
 }
 
 void UserTableShard::Create() {
@@ -69,7 +72,7 @@ void UserTableShard::Create() {
       }
 
       Poco::Data::Statement create_stmt(session);
-      create_stmt << "CREATE TABLE IF NOT EXISTS real_id ("
+      create_stmt << "CREATE TABLE IF NOT EXISTS real_ids ("
                   << "PRIMARY KEY (id),"
                   << "id INT NOT NULL AUTO_INCREMENT);",
           now;

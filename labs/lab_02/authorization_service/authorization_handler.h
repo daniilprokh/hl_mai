@@ -246,7 +246,7 @@ class AutorizationHandler : public Poco::Net::HTTPRequestHandler {
       root->set("type", "/errors/not_found");
       root->set("title", "Internal exception");
       root->set("detail", "users not found");
-      root->set("instance", "/search");
+      root->set("instance", "/search/login");
 
       std::ostream &ostr = response.send();
       Poco::JSON::Stringifier::stringify(root, ostr);

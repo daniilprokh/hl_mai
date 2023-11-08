@@ -10,4 +10,4 @@ RUN git clone https://github.com/mfontanini/cppkafka && cd cppkafka && mkdir bui
 RUN git clone https://github.com/daniilprokh/hl_mai.git
 RUN sudo ldconfig
 RUN cd hl_mai && mkdir build && cd build && cmake .. && make
-ENTRYPOINT [ "hl_mai/build/labs/lab_01/lab_01_authorization_service" ]
+ENTRYPOINT [ "hl_mai/build/labs/lab_02/lab_02_authorization_service" ]
