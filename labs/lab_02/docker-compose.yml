@@ -13,24 +13,10 @@ services:
       - arch-network
     ports:
       - 3360:3306
-    healthcheck:
-      test: [
-        "CMD",
-        "mariadb",
-        "--user=test_admin",
-        "--password=password",
-#        "--execute=SELECT * FROM users",
-        "--host=127.0.0.1",
-        "--port=3306",
-        "messenger"
-      ]
-      interval: 10s
-      timeout: 5s
-      retries: 5
     volumes:
       - mariadb-1-data:/var/lib/mysql
       # bind-mount any sql files that should be run while initializing
-      - ./database/scripts/creation.sql:/docker-entrypoint-initdb.d/creation.sql
+      #- ./database/scripts/creation.sql:/docker-entrypoint-initdb.d/creation.sql
   
   mariadb-2:
     image: mariadb
@@ -44,24 +30,10 @@ services:
       - arch-network
     ports:
       - 3361:3306
-    healthcheck:
-      test: [
-        "CMD",
-        "mariadb",
-        "--user=test_admin",
-        "--password=password",
-#        "--execute=SELECT * FROM users",
-        "--host=127.0.0.1",
-        "--port=3306",
-        "messenger"
-      ]
-      interval: 10s
-      timeout: 5s
-      retries: 5
     volumes:
       - mariadb-2-data:/var/lib/mysql
       # bind-mount any sql files that should be run while initializing
-      - ./scripts/creation.sql:/docker-entrypoint-initdb.d/creation.sql
+      #- ./scripts/creation.sql:/docker-entrypoint-initdb.d/creation.sql
 
   proxysql:
     build:
@@ -106,8 +78,6 @@ services:
       - arch-network
     depends_on:
       - proxysql
-      - mariadb-1
-      - mariadb-2
       
 volumes:
   mariadb-1-data:
