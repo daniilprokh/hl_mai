@@ -9,5 +9,5 @@ RUN git clone https://github.com/edenhill/librdkafka.git && cd librdkafka && ./c
 RUN git clone https://github.com/mfontanini/cppkafka && cd cppkafka && mkdir build && cd build && cmake .. && make && sudo make install && cd .. && cd .. 
 RUN git clone https://github.com/daniilprokh/hl_mai.git
 RUN sudo ldconfig
-RUN cd hl_mai && mkdir build && cd build && cmake  .. && make
-ENTRYPOINT [ "hl_mai/build/labs/lab_02/lab_02_web_service" ]
+RUN cd hl_mai && mkdir build && cd build && cmake .. && make
+ENTRYPOINT [ "hl_mai/build/labs/lab_01/lab_01_authorization_service" ]

@@ -112,10 +112,7 @@ class GroupChatHandler : public Poco::Net::HTTPRequestHandler {
     uint64_t chat_id = stoull(form.get(properties[0]));
 
     auto &chat_user_table = database::ChatUserTable::GetInstance();
-    std::vector<uint64_t> user_ids = chat_user_table.GetChatUsers(chat_id);
-    if (std::find(user_ids.begin(),
-                  user_ids.end(),
-                  user_id.value()) == user_ids.end()) {
+    if (!chat_user_table.CheckUser(user_id.value(), chat_id)) {
       response.setStatus(Poco::Net::HTTPResponse::HTTP_NOT_FOUND);
 
       Poco::JSON::Object::Ptr root = new Poco::JSON::Object();

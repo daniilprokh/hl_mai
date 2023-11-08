@@ -5,7 +5,7 @@ services:
     image: mariadb
     restart: unless-stopped
     environment:
-      MARIADB_ROOT_PASSWORD: password
+      MARIADB_ROOT_PASSWORD: '1'
       MARIADB_DATABASE: messenger
       MARIADB_USER: test_admin
       MARIADB_PASSWORD: password
@@ -19,7 +19,7 @@ services:
         "mariadb",
         "--user=test_admin",
         "--password=password",
-        "--execute=SELECT * FROM users",
+#        "--execute=SELECT * FROM users",
         "--host=127.0.0.1",
         "--port=3306",
         "messenger"
@@ -31,13 +31,12 @@ services:
       - mariadb-1-data:/var/lib/mysql
       # bind-mount any sql files that should be run while initializing
       - ./database/scripts/creation.sql:/docker-entrypoint-initdb.d/creation.sql
-      - ./database/scripts/insertion.sql:/docker-entrypoint-initdb.d/insertion.sql
   
   mariadb-2:
     image: mariadb
     restart: unless-stopped
     environment:
-      MARIADB_ROOT_PASSWORD: password
+      MARIADB_ROOT_PASSWORD: '1'
       MARIADB_DATABASE: messenger
       MARIADB_USER: test_admin
       MARIADB_PASSWORD: password
@@ -51,7 +50,7 @@ services:
         "mariadb",
         "--user=test_admin",
         "--password=password",
-        "--execute=SELECT * FROM users",
+#        "--execute=SELECT * FROM users",
         "--host=127.0.0.1",
         "--port=3306",
         "messenger"
@@ -62,9 +61,7 @@ services:
     volumes:
       - mariadb-2-data:/var/lib/mysql
       # bind-mount any sql files that should be run while initializing
-      - ./database/scripts/creation.sql:/docker-entrypoint-initdb.d/creation.sql
-      - ./database/scripts/insertion.sql:/docker-entrypoint-initdb.d/insertion.sql
-
+      - ./scripts/creation.sql:/docker-entrypoint-initdb.d/creation.sql
 
   proxysql:
     build:
@@ -90,14 +87,14 @@ services:
       - "6033:6033"
       # Mysql Admin Port
       - "6032:6032"
-  web_server:
+  authorization_server:
     build:
-      context: web_server
+      context: authorization_server
       dockerfile: Dockerfile
-    container_name: web_server
+    container_name: authorization_server
     environment:
-      - DB_HOST=mariadb
-      - DB_PORT=3306
+      - DB_HOST=proxysql
+      - DB_PORT=6033
       - DB_LOGIN=test_admin
       - DB_PASSWORD=password
       - DB_DATABASE=messenger

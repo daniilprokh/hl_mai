@@ -39,6 +39,26 @@ void ChatUserTable::SaveToMySQL(ChatUser &chatUser) {
   );
 }
 
+bool ChatUserTable::CheckUser(uint64_t userId, uint64_t chatId) {
+    return SessionOperation<bool>(
+    [this, &userId, &chatId](Poco::Data::Session &session) {
+      Poco::Data::Statement select(session);
+      std::vector<uint64_t> user_ids;
+      uint64_t user_id;
+      select << "SELECT user_id FROM %s "
+                "WHERE user_id = ? AND chat_id = ? "
+                "LIMIT 1",
+          this->kName,
+          into(user_id),
+          use(userId),
+          use(chatId),
+          now;
+      Poco::Data::RecordSet rs(select);
+      return rs.moveFirst();
+    }
+  );
+}
+
 std::vector<uint64_t> ChatUserTable::GetChatUsers(uint64_t chatId) {
   return SessionOperation<std::vector<uint64_t>>(
     [this, &chatId](Poco::Data::Session &session) {
