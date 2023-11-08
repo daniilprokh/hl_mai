@@ -28,6 +28,7 @@ class AutorizationHandler : public Poco::Net::HTTPRequestHandler {
     {
       const std::string &method = request.getMethod();
       const std::string &uri = request.getURI();
+      std::cout << "request: " << uri << std::endl;
       if (method == Poco::Net::HTTPRequest::HTTP_GET) {
         if (ContainsSubstr(uri, "/user")) {
           HandleUserRequest(form, response);

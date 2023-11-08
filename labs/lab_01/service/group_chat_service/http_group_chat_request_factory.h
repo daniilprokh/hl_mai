@@ -27,8 +27,6 @@ class HTTPGroupChatRequestFactory :
   Poco::Net::HTTPRequestHandler* createRequestHandler(
       const Poco::Net::HTTPServerRequest& request) override
   {
-    const std::string& uri = request.getURI();
-    std::cout << "request: " << uri << std::endl;
     return new GroupChatHandler(format_);
   }
  private:

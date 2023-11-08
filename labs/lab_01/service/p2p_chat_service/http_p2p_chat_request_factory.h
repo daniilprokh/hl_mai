@@ -25,8 +25,6 @@ class HTTPP2pChatRequestFactory :
   Poco::Net::HTTPRequestHandler* createRequestHandler(
       const Poco::Net::HTTPServerRequest& request) override
   {
-    const std::string& uri = request.getURI();
-    std::cout << "request: " << uri << std::endl;
     return new P2pChatHandler(format_);
   }
  private:

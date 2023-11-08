@@ -30,6 +30,7 @@ class P2pChatHandler : public Poco::Net::HTTPRequestHandler {
     try {
       const std::string &method = request.getMethod();
       const std::string &uri = request.getURI();
+      std::cout << "request: " << uri << std::endl;
       if (method == Poco::Net::HTTPRequest::HTTP_GET) {
         if (ContainsSubstr(uri, "/load")) {
           HandleLoadRequest(form, response);

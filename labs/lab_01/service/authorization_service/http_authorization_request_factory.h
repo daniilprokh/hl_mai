@@ -25,15 +25,7 @@ class HTTPAutorizationRequestFactory :
   Poco::Net::HTTPRequestHandler* createRequestHandler(
       const Poco::Net::HTTPServerRequest& request) override
   {
-    const std::string& uri = request.getURI();
-    std::cout << "request: " << uri << std::endl;
-    if (ContainsSubstr(uri, "/user") ||
-        ContainsSubstr(uri, "/search") ||
-        ContainsSubstr(uri, "/auth"))  {
-      return new AutorizationHandler(format_);
-    }
-    
-    return 0;
+    return new AutorizationHandler(format_);
   }
  private:
   std::string format_;
