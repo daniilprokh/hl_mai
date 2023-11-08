@@ -19,7 +19,7 @@ UserTableShard::UserTableShard()
 
 uint64_t UserTableShard::GetNextId(Poco::Data::Session &session) {
   Poco::Data::Statement insert(session);
-  insert << "INSERT INTO real_ids () VALUES()", now;
+  insert << "INSERT INTO real_ids (id) VALUES(NULL)", now;
 
   auto id = GetLastId(session);
   std::cout << "last_id: " << id.value_or(-1) << std::endl;
