@@ -21,12 +21,16 @@ uint64_t UserTableShard::GetNextId(Poco::Data::Session &session) {
   Poco::Data::Statement insert(session);
   insert << "INSERT INTO real_ids (id) VALUES(NULL)", now;
 
-  auto id = GetLastId(session);
-  std::cout << "last_id: " << id.value_or(-1) << std::endl;
-  //Poco::Data::Statement d(session);
-  //d << "DELETE FROM real_id;", now;
+  uint64_t id;
+  Poco::Data::Statement select(session);
+  select << "SELECT id FROM real_ids "
+            "ORDER BY id DESC "
+            "LIMIT 1",
+      use(id),
+      now;
+  std::cout << "next_id: " << id << std::endl;
 
-  return id.value();
+  return id;
 }
 
 void UserTableShard::Insertion(Poco::Data::Session &session, User &user) {

@@ -1,39 +1,41 @@
 version: "2.1"
 
 services:
-  mariadb-1:
-    image: mariadb
+  db-node-1:
+    build:
+      context: mysql
+      dockerfile: Dockerfile
+    container_name: db-node-1
     restart: unless-stopped
     environment:
       MARIADB_ROOT_PASSWORD: '1'
-      MARIADB_DATABASE: messenger
-      MARIADB_USER: test_admin
-      MARIADB_PASSWORD: password
+      MARIADB_DATABASE: archdb
+      MARIADB_USER: stud
+      MARIADB_PASSWORD: stud
     networks:
       - arch-network
     ports:
       - 3360:3306
     volumes:
-      - mariadb-1-data:/var/lib/mysql
-      # bind-mount any sql files that should be run while initializing
-      #- ./database/scripts/creation.sql:/docker-entrypoint-initdb.d/creation.sql
+      - db-node-1-data:/var/lib/mysql
   
-  mariadb-2:
-    image: mariadb
+  db-node-2:
+    build:
+      context: mysql
+      dockerfile: Dockerfile
+    container_name: db-node-2
     restart: unless-stopped
     environment:
       MARIADB_ROOT_PASSWORD: '1'
-      MARIADB_DATABASE: messenger
-      MARIADB_USER: test_admin
-      MARIADB_PASSWORD: password
+      MARIADB_DATABASE: archdb
+      MARIADB_USER: stud
+      MARIADB_PASSWORD: stud
     networks:
       - arch-network
     ports:
       - 3361:3306
     volumes:
-      - mariadb-2-data:/var/lib/mysql
-      # bind-mount any sql files that should be run while initializing
-      #- ./scripts/creation.sql:/docker-entrypoint-initdb.d/creation.sql
+      - db-node-2-data:/var/lib/mysql
 
   proxysql:
     build:
@@ -45,12 +47,12 @@ services:
     volumes:
       - proxysql-data:/var/lib/proxysql
     healthcheck:
-      test: "/usr/bin/mysql --user=test_admin --password=password --execute \"SHOW DATABASES;\""
+      test: "/usr/bin/mysql --user=stud --password=stud --execute \"SHOW DATABASES;\""
       timeout: 20s
       retries: 5
     depends_on:
-      - mariadb-1
-      - mariadb-2
+      - db-node-1
+      - db-node-2
 
     networks:
       - arch-network
@@ -67,9 +69,9 @@ services:
     environment:
       - DB_HOST=proxysql
       - DB_PORT=6033
-      - DB_LOGIN=test_admin
-      - DB_PASSWORD=password
-      - DB_DATABASE=messenger
+      - DB_LOGIN=stud
+      - DB_PASSWORD=stud
+      - DB_DATABASE=archdb
       - SERVICE_PORT=8080
       - LD_LIBRARY_PATH=/usr/local/lib
     ports:
@@ -80,8 +82,8 @@ services:
       - proxysql
       
 volumes:
-  mariadb-1-data:
-  mariadb-2-data:
+  db-node-1-data:
+  db-node-2-data:
   proxysql-data:
 
 networks:
