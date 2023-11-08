@@ -19,7 +19,7 @@ UserTableShard::UserTableShard()
 
 uint64_t UserTableShard::GetNextId(Poco::Data::Session &session) {
   Poco::Data::Statement insert(session);
-  insert << "INSERT INTO real_ids VALUES();", now;
+  insert << "INSERT INTO real_ids () VALUES()", now;
 
   auto id = GetLastId(session);
   std::cout << id.value_or(-1);
@@ -30,7 +30,9 @@ uint64_t UserTableShard::GetNextId(Poco::Data::Session &session) {
 }
 
 void UserTableShard::Insertion(Poco::Data::Session &session, User &user) {
+  std::cout << 2 << std::endl;
   uint64_t next_id = GetNextId(session);
+  std::cout << 3 << std::endl;
   auto &database = database::Database::GetInstance();
   std::string hint = database.GetUserShardingHint(next_id);
   Poco::Data::Statement insert(session);
@@ -69,6 +71,7 @@ void UserTableShard::Create() {
             this->kName,
             hint,
             now;
+        std::cout << create_stmt.toString() << std::endl;
       }
 
       Poco::Data::Statement create_stmt(session);
@@ -83,11 +86,8 @@ void UserTableShard::Create() {
 void UserTableShard::SaveToMySQL(User& user) {
   SessionOperation<void>(
     [this, &user](Poco::Data::Session& session) {
+      std::cout << 1 << std::endl;
       this->Insertion(session, user);
-
-      if (auto id = GetLastId(session)) {
-        user.set<kUserId>(id.value());
-      }
     }
   );
 }
