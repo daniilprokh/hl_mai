@@ -26,7 +26,7 @@ uint64_t UserTableShard::GetNextId(Poco::Data::Session &session) {
   select << "SELECT id FROM real_ids "
             "ORDER BY id DESC "
             "LIMIT 1",
-      use(id),
+      into(id),
       now;
   std::cout << "next_id: " << id << std::endl;
 
