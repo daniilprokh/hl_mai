@@ -66,7 +66,7 @@ void UserTableShard::Create() {
         Poco::Data::Statement create_stmt(session);
         create_stmt << "CREATE TABLE IF NOT EXISTS %s ("
                     << "PRIMARY KEY (user_id),"
-                    << "user_id    INT          NOT NULL AUTO_INCREMENT,"
+                    << "user_id    INT          NOT NULL,"
                     << "first_name VARCHAR(256) NOT NULL,"
                     << "last_name  VARCHAR(256) NOT NULL,"
                     << "email      VARCHAR(256) NOT NULL,"
