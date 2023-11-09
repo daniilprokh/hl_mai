@@ -65,7 +65,8 @@ void UserTableShard::Create() {
       for (std::string &hint : database.GetShardingHints()) {
         Poco::Data::Statement create_stmt(session);
         create_stmt << "CREATE TABLE IF NOT EXISTS %s ("
-                    << "PRIMARY KEY (user_id),"
+                    << "PRIMARY KEY (id),"
+                    << "id         INT          NOT NULL AUTO_INCREMENT,"
                     << "user_id    INT          NOT NULL,"
                     << "first_name VARCHAR(256) NOT NULL,"
                     << "last_name  VARCHAR(256) NOT NULL,"
@@ -100,7 +101,7 @@ std::optional<User> UserTableShard::ReadById(uint64_t id) {
 
       Poco::Data::Statement select(session);
       User user;
-      select << "SELECT * "
+      select << "SELECT (user_id, first_name, last_name, email, login, password) "
                 "FROM %s WHERE user_id = ? %s",
           this->kName,
           hint,
@@ -177,7 +178,7 @@ std::vector<User> UserTableShard::Search(std::string firstName,
         lastName += '%';
         for (std::string &hint : database.GetShardingHints()) {
           Poco::Data::Statement select(session);
-          select << "SELECT * "
+          select << "SELECT user_id, first_name, last_name, email, login, password "
                     "FROM %s "
                     "WHERE first_name LIKE ? AND last_name LIKE ? %s",
               this->kName,
