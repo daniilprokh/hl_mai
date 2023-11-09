@@ -29,7 +29,10 @@ uint64_t UserTableShard::GetNextId(Poco::Data::Session &session) {
       into(shard_count),
       now;
 
-    count += shard_count;
+    Poco::Data::RecordSet rs(select);
+    if (rs.moveFirst()) {
+        count += shard_count;
+    }
   }
 
   return count + 1;
