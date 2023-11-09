@@ -18,24 +18,27 @@ UserTableShard::UserTableShard()
 {}
 
 uint64_t UserTableShard::GetNextId(Poco::Data::Session &session) {
-  uint64_t count;
-  Poco::Data::Statement select(session);
-  select << "SELECT COUNT(*) FROM real_ids",
-      into(count),
+  uint64_t count = 0;
+  auto &database = database::Database::GetInstance();
+  for (std::string &hint : database.GetShardingHints()) {
+    Poco::Data::Statement select(session);
+    uint64_t shard_count;
+    select << "SELECT COUNT(*) FROM %s %s",
+      kName,
+      hint,
+      into(shard_count),
       now;
-  count += 1;
 
-  Poco::Data::Statement insert(session);
-  insert << "INSERT INTO real_ids (id) VALUES(?)",
-      use(count),
-      now;
+    count += shard_count;
+  }
 
-  return count;
+  return count + 1;
 }
 
 void UserTableShard::Insertion(Poco::Data::Session &session, User &user) {
   std::cout << 2 << std::endl;
   uint64_t next_id = GetNextId(session);
+  std::cout << "next_id: " << next_id << std::endl;
   std::cout << 3 << std::endl;
   auto &database = database::Database::GetInstance();
   std::string hint = database.GetUserShardingHint(next_id);
@@ -75,14 +78,7 @@ void UserTableShard::Create() {
             this->kName,
             hint,
             now;
-        std::cout << create_stmt.toString() << std::endl;
       }
-
-      Poco::Data::Statement create_stmt(session);
-      create_stmt << "CREATE TABLE IF NOT EXISTS real_ids ("
-                  << "PRIMARY KEY (id),"
-                  << "id    INT NOT NULL AUTO_INCREMENT);",
-          now;
     } 
   );
 }
