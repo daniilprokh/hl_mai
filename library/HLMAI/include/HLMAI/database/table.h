@@ -47,12 +47,7 @@ std::optional<uint64_t> Table<Tuple>::GetLastId(
   Poco::Data::Statement select(session);
   select << "SELECT LAST_INSERT_ID()", 
       Poco::Data::Keywords::into(id),
-      Poco::Data::Keywords::range(0, 1);
-
-  if (!select.done())
-  {
-    select.execute();
-  }
+      Poco::Data::Keywords::now;
     
   Poco::Data::RecordSet rs(select);
   return rs.moveFirst() ? std::optional<uint64_t>(id)
