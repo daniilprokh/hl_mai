@@ -13,7 +13,7 @@ using namespace Poco::Data::Keywords;
 namespace database {
 
 UserTableShard::UserTableShard() 
-  : Table<User>("users", 6),
+  : Table<User>("users", 7),
     Singleton<UserTableShard>()
 {}
 
@@ -22,15 +22,16 @@ uint64_t UserTableShard::GetNextId(Poco::Data::Session &session) {
   auto &database = database::Database::GetInstance();
   for (std::string &hint : database.GetShardingHints()) {
     Poco::Data::Statement select(session);
-    uint64_t shard_count;
+    uint64_t shard_count = 0;
     select << "SELECT COUNT(*) FROM %s %s",
       kName,
       hint,
       into(shard_count),
       now;
-
+    std::cout << select.toString() << std::endl;
     Poco::Data::RecordSet rs(select);
     if (rs.moveFirst()) {
+        std::cout << "shard_count: " << shard_count << std::endl;
         count += shard_count;
     }
   }
